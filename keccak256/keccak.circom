@@ -169,7 +169,7 @@ template Keccakf() {
 
 template Keccak(nBitsIn, nBitsOut) {
     signal input in[nBitsIn];
-    signal output out[nBitsOut];
+    signal out[nBitsOut];
     var i;
 
     component f = Final(nBitsIn);
