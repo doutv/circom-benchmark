@@ -58,9 +58,9 @@ function RapidServer() {
   # Get prover server CPU and memory usage
   ps_output=$(ps -p `pidof proverServer` -o %cpu,vsz --no-headers)
   avg_cpu=$(echo $ps_output | awk '{print $1"%"}')
-  avg_mem=$(echo $ps_output | awk '{$2=int($2/1024)"M"; print $2}')
-
-  echo mem ${avg_mem}
+  # avg_mem=$(echo $ps_output | awk '{$2=int($2/1024)"M"; print $2}')
+  mem=$(grep -E 'VmPeak' /proc/`pidof proverServer`/status | awk '{print $2/1024 "MB"}' | numfmt --field=2 --format="%.2f")
+  echo peak mem ${mem}
   echo ${avg_t}
   echo cpu ${avg_cpu}
 
