@@ -1,7 +1,7 @@
 #!/bin/bash
 # Usage: benchmark.sh <circuit-name>
 # Example: benchmark.sh complex-circuit
-
+# set -x
 source .env
 source "scripts/_prelude.sh"
 
@@ -18,15 +18,14 @@ CIRCUIT_NAME="$2"
 # Single thread: sudo systemd-run --scope -p CPUQuota=100% ./shell_scripts/benchmark.sh
 SAMPLE_SIZE=10
 
+TIME=(/usr/bin/time -f "mem %M\ntime %e\ncpu %P")
 avg_time() {
     # usage: avg_time n command ...
-    TIME=(/usr/bin/time -f "mem %M\ntime %e\ncpu %P")
     n=$1; shift
     (($# > 0)) || return                   # bail if no command given
     echo "$@"
     for ((i = 0; i < n; i++)); do
-        "${TIME[@]}" "$@" 2>&1
-        # | tee /dev/stderr
+        "${TIME[@]}" "$@" 2>&1 | tee /dev/stderr
     done | awk '
         /^mem [0-9]+/ { mem = mem + $2; nm++ }
         /^time [0-9]+\.[0-9]+/ { time = time + $2; nt++ }
@@ -38,11 +37,19 @@ avg_time() {
            }'
 }
 
-function RapidServer() {
-  pushd "$CIRCUIT_DIR/target" > /dev/null
+function RapidStandalone() {
+  avg_time $SAMPLE_SIZE ${prover} "$CIRCUIT_NAME".zkey build/${CIRCUIT_NAME}.wtns proof.json public.json
+}
 
-  # Create a symbolic link to rename final.zkey
-  ln -s ${CIRCUIT_NAME}_final.zkey $CIRCUIT_NAME.zkey > /dev/null 2>&1 || true
+function GPURapidStandalone() {
+  avg_time $SAMPLE_SIZE ${gpuProver} "$CIRCUIT_NAME".zkey build/${CIRCUIT_NAME}.wtns proof.json public.json
+}
+
+function TachyonCPU() {
+  /usr/bin/time -v ${tachyon} "$CIRCUIT_NAME".zkey build/${CIRCUIT_NAME}.wtns proof.json public.json --num_runs $SAMPLE_SIZE --no_zk
+}
+
+function RapidServer() {
   # Kill the proverServer if it is running on 9080 port
   kill -9 $(lsof -t -i:9080) > /dev/null 2>&1 || true
   # Start the prover server in the background
@@ -66,10 +73,23 @@ function RapidServer() {
 
   # Kill the proverServer
   kill $PROVER_SERVER_PID
-  popd > /dev/null
 }
 
-echo "Sample Size =" $SAMPLE_SIZE
+echo "---------- $CIRCUIT_NAME ----------"
+echo "Sample Size: " $SAMPLE_SIZE
+pushd "$CIRCUIT_DIR/target" > /dev/null
+# Create a symbolic link to rename final.zkey
+ln -s ${CIRCUIT_NAME}_final.zkey $CIRCUIT_NAME.zkey > /dev/null 2>&1 || true
 
-echo "========== RapidSnark Server  =========="
-RapidServer
+echo "========== Rapidsnark CPU =========="
+RapidStandalone
+
+echo "========== Rapidsnark GPU =========="
+GPURapidStandalone
+
+echo "========== Tachyon CPU =========="
+TachyonCPU
+
+# echo "========== Rapidsnark Server  =========="
+# RapidServer
+popd > /dev/null

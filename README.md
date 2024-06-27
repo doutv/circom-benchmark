@@ -11,5 +11,6 @@ Require: rapidsnark
 for size in {100k,400k,1200k,1600k,3200k}
 do
     ./2-benchmark.sh complex-circuit complex-circuit-$size-$size
+    sleep 0.1
 done
 ```
