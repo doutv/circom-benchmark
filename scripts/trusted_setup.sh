@@ -3,6 +3,9 @@
 # Example usage:
 # ./scripts/trusted_setup.sh multiplier2 08 multiplier2
 
+# Increase node.js V8 memory in MB
+export NODE_OPTIONS="--max-old-space-size=10000"
+
 # Deal with errors
 set -euo pipefail
 

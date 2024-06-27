@@ -46,11 +46,11 @@ function RapidServer() {
   # Kill the proverServer if it is running on 9080 port
   kill -9 $(lsof -t -i:9080) > /dev/null 2>&1 || true
   # Start the prover server in the background
-  ${proverServer} 9080 "$CIRCUIT_NAME".zkey > proverServer.log 2>&1 &
+  ${proverServer} 9080 "$CIRCUIT_NAME".zkey > ../../rapidsnark.log 2>&1 &
   # Save the PID of the proverServer to kill it later
   PROVER_SERVER_PID=$!
   # Give the server some time to start
-  sleep 0.5
+  sleep 3
 
   # Run the prover client and get the average time
   avg_t=$(avg_time $SAMPLE_SIZE node ${REQ} ../input.json $CIRCUIT_NAME | grep "time")

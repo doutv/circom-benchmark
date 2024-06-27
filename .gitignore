@@ -2,3 +2,4 @@
 *.ptau
 node_modules
 target
+*.log
