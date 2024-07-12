@@ -16,4 +16,4 @@ done
 ```
 
 ## Credits
-Cricom scripts from https://github.com/zkmopro/mopro
+Scripts from https://github.com/zkmopro/mopro
