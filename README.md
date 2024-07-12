@@ -14,3 +14,6 @@ do
     sleep 0.1
 done
 ```
+
+## Credits
+Cricom scripts from https://github.com/zkmopro/mopro
