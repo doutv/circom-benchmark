@@ -5,10 +5,10 @@ source "scripts/_prelude.sh"
 source .env
 
 # Assert we're in the project root
-if [[ ! -d "scripts" || ! -d "rsa" ]]; then
-    echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi, mopro-core, and mopro-ios folders.${DEFAULT}"
-    exit 1
-fi
+# if [[ ! -d "scripts" || ! -d "rsa" ]]; then
+#     echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi, mopro-core, and mopro-ios folders.${DEFAULT}"
+#     exit 1
+# fi
 
 PROJECT_DIR=$(pwd)
 CIRCOM_DIR="${PROJECT_DIR}"
@@ -55,35 +55,41 @@ generate_witness() {
 print_action "[core/circom] Compiling example circuits..."
 cd "${CIRCOM_DIR}"
 
+npm_install eddsa
+compile_circuit eddsa eddsa.circom
+generate_witness eddsa eddsa
+print_action "[core/circom] Running trusted setup for rsa..."
+./scripts/trusted_setup.sh eddsa 25 eddsa
+
 # Setup and compile keccak256
-npm_install keccak256
-compile_circuit keccak256 keccak256.circom
-generate_witness keccak256 keccak256
+# npm_install keccak256
+# compile_circuit keccak256 keccak256.circom
+# generate_witness keccak256 keccak256
 
 # Setup and compile rsa
-npm_install rsa
-compile_circuit rsa rsa.circom
-generate_witness rsa rsa
+# npm_install rsa
+# compile_circuit rsa rsa.circom
+# generate_witness rsa rsa
 
 # Setup and compile complex-circuit
-npm_install complex-circuit
-for size in {100k,200k,400k,800k,1000k,1200k,1600k,3200k}
-do
-    compile_circuit complex-circuit complex-circuit-${size}-${size}.circom
-    generate_witness complex-circuit complex-circuit-${size}-${size}
-done
+# npm_install complex-circuit
+# for size in {100k,200k,400k,800k,1000k,1200k,1600k,3200k}
+# do
+#     compile_circuit complex-circuit complex-circuit-${size}-${size}.circom
+#     generate_witness complex-circuit complex-circuit-${size}-${size}
+# done
 
 # Run trusted setup for keccak256
-print_action "[core/circom] Running trusted setup for keccak256..."
-./scripts/trusted_setup.sh keccak256 25 keccak256
+# print_action "[core/circom] Running trusted setup for keccak256..."
+# ./scripts/trusted_setup.sh keccak256 25 keccak256
 
 # Run trusted setup for rsa
-print_action "[core/circom] Running trusted setup for rsa..."
-./scripts/trusted_setup.sh rsa 25 rsa
+# print_action "[core/circom] Running trusted setup for rsa..."
+# ./scripts/trusted_setup.sh rsa 21 rsa
 
 # Run trusted setup for complex circuit
-print_action "[core/circom] Running trusted setup for complex circuit..."
-for size in {100k,200k,400k,800k,1000k,1200k,1600k,3200k}
-do
-    ./scripts/trusted_setup.sh complex-circuit 25 complex-circuit-${size}-${size}
-done
+# print_action "[core/circom] Running trusted setup for complex circuit..."
+# for size in {100k,200k,400k,800k,1000k,1200k,1600k,3200k}
+# do
+#     ./scripts/trusted_setup.sh complex-circuit 25 complex-circuit-${size}-${size}
+# done
