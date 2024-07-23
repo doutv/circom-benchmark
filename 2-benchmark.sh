@@ -25,7 +25,7 @@ avg_time() {
     (($# > 0)) || return                   # bail if no command given
     echo "$@"
     for ((i = 0; i < n; i++)); do
-        "${TIME[@]}" "$@" 2>&1 | tee /dev/stderr
+        "${TIME[@]}" "$@" 2>&1
     done | awk '
         /^mem [0-9]+/ { mem = mem + $2; nm++ }
         /^time [0-9]+\.[0-9]+/ { time = time + $2; nt++ }
@@ -46,7 +46,7 @@ function GPURapidStandalone() {
 }
 
 function TachyonCPU() {
-  /usr/bin/time -v ${tachyon} "$CIRCUIT_NAME".zkey build/${CIRCUIT_NAME}.wtns proof.json public.json --num_runs $SAMPLE_SIZE --no_zk
+  avg_time $SAMPLE_SIZE ${tachyon} "$CIRCUIT_NAME".zkey build/${CIRCUIT_NAME}.wtns proof.json public.json
 }
 
 function RapidServer() {
@@ -84,8 +84,8 @@ ln -s ${CIRCUIT_NAME}_final.zkey $CIRCUIT_NAME.zkey > /dev/null 2>&1 || true
 echo "========== Rapidsnark CPU =========="
 RapidStandalone
 
-echo "========== Rapidsnark GPU =========="
-GPURapidStandalone
+# echo "========== Rapidsnark GPU =========="
+# GPURapidStandalone
 
 echo "========== Tachyon CPU =========="
 TachyonCPU
