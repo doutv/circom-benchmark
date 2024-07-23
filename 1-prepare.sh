@@ -3,7 +3,6 @@
 # Source the script prelude
 source "scripts/_prelude.sh"
 source .env
-
 # Assert we're in the project root
 # if [[ ! -d "scripts" || ! -d "rsa" ]]; then
 #     echo -e "${RED}Error: This script must be run from the project root directory that contains mopro-ffi, mopro-core, and mopro-ios folders.${DEFAULT}"
@@ -40,14 +39,16 @@ generate_witness() {
     local circuit_name=$2
 
     pushd $circuit_dir/target > /dev/null
-        # Build circuit cpp
-        pushd "$circuit_name"_cpp/ > /dev/null
-        make -j12
-        mkdir -p ../build
-        cp "$circuit_name" ../build/
-        popd > /dev/null
+
+    #     # Build circuit cpp
+    #     pushd "$circuit_name"_cpp/ > /dev/null
+    #     make -j12
+    #     mkdir -p ../build
+    #     cp "$circuit_name" ../build/
+    #     popd > /dev/null
+
     # Generate witness
-    node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json ./build/${circuit_name}.wtns
+    node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json ${circuit_name}.wtns
     popd > /dev/null
 }
 
@@ -59,7 +60,7 @@ npm_install eddsa
 compile_circuit eddsa eddsa.circom
 generate_witness eddsa eddsa
 print_action "[core/circom] Running trusted setup for rsa..."
-./scripts/trusted_setup.sh eddsa 25 eddsa
+./scripts/trusted_setup.sh eddsa 21 eddsa
 
 # Setup and compile keccak256
 # npm_install keccak256

@@ -5,9 +5,6 @@ Require: rapidsnark
 2. Compile the circuits and Benchmark
 ```sh
 ./1-prepare.sh
-# On M1 Mac, the witness generation should fail
-# Currently, only support x86 machine
-# See Reason: https://github.com/iden3/circom/issues/201
 
 ./2-benchmark.sh rsa rsa
 ./2-benchmark.sh keccak256 keccak256
