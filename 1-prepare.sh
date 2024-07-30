@@ -35,7 +35,8 @@ generate_witness() {
     local circuit_name=$2
 
     pushd $circuit_dir/target > /dev/null
-    node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json ./${circuit_name}.wtns
+    mkdir -p build
+    node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json build/${circuit_name}.wtns
     popd > /dev/null
 }
 
