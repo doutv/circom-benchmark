@@ -16,25 +16,25 @@ CIRCUIT_DIR="$1"
 CIRCUIT_NAME="$2"
 
 # Single thread: sudo systemd-run --scope -p CPUQuota=100% ./shell_scripts/benchmark.sh
-SAMPLE_SIZE=10
+SAMPLE_SIZE=2
 
 TIME=(/usr/bin/time -f "mem %M\ntime %e\ncpu %P")
 avg_time() {
-    # usage: avg_time n command ...
-    n=$1; shift
-    (($# > 0)) || return                   # bail if no command given
-    echo "$@"
-    for ((i = 0; i < n; i++)); do
-        "${TIME[@]}" "$@" 2>&1
-    done | awk '
-        /^mem [0-9]+/ { mem = mem + $2; nm++ }
-        /^time [0-9]+\.[0-9]+/ { time = time + $2; nt++ }
-        /^cpu [0-9]+%/  { cpu  = cpu  + substr($2,1,length($2)-1); nc++}
-        END    {
-             if (nm>0) printf("mem %d MB\n", mem/nm/1024);
-             if (nt>0) printf("time %f s\n", time/nt);
-             if (nc>0) printf("cpu %d \n",  cpu/nc)
-           }'
+  # usage: avg_time n command ...
+  n=$1; shift
+  (($# > 0)) || return                   # bail if no command given
+  echo "$@"
+  for ((i = 0; i < n; i++)); do
+    "${TIME[@]}" "$@"
+  done | tee >(cat >&2) | awk '
+    /^mem [0-9]+/ { mem = mem + $2; nm++ }
+    /^time [0-9]+\.[0-9]+/ { time = time + $2; nt++ }
+    /^cpu [0-9]+%/  { cpu  = cpu  + substr($2,1,length($2)-1); nc++}
+    END    {
+       if (nm>0) printf("mem %d MB\n", mem/nm/1024);
+       if (nt>0) printf("time %f s\n", time/nt);
+       if (nc>0) printf("cpu %d \n",  cpu/nc)
+       }'
 }
 
 function RapidStandalone() {
