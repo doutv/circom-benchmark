@@ -29,6 +29,8 @@ PTAU_PATH="${PTAU_DIR}/powersOfTau28_hez_final_${PTAU}.ptau"
 if [ ! -f "$PTAU_PATH" ]; then
     echo "Downloading Powers of Tau file..."
     wget -P $PTAU_DIR https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_${PTAU}.ptau
+    # echo "Error: Powers of Tau file not found at $PTAU_PATH and download is disabled."
+    # exit 1
 else
     echo "File $PTAU_PATH already exists, skipping download."
 fi
