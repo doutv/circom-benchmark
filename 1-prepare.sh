@@ -1,4 +1,6 @@
 #!/bin/bash
+set -x
+set -e
 
 # Source the script prelude
 source "scripts/_prelude.sh"
@@ -36,19 +38,28 @@ generate_witness() {
 
     pushd $circuit_dir/target > /dev/null
     mkdir -p build
-    node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json build/${circuit_name}.wtns
+    if [ ! -f "build/${circuit_name}.wtns" ]; then
+        if [ ! -f "../input.json"]; then
+            node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../${circuit}.json build/${circuit_name}.wtns
+        else
+            node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json build/${circuit_name}.wtns
+        fi
+    else
+        echo "File build/${circuit_name}.wtns found, skipping witness generation."
+    fi
     popd > /dev/null
 }
 
 # Check if arguments are provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <circuit>"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <circuit-dir> <circuit-name>"
+    echo "Example: $0 complex-circuit complex-circuit-100k-100k"
     exit 1
 fi
 
 # Read parameters from command line
-circuit=$1
 circuit_dir="${CIRCOM_DIR}/$1"
+circuit=$2
 
 # Call functions with the provided parameters
 npm_install $circuit_dir
