@@ -39,7 +39,7 @@ generate_witness() {
     pushd $circuit_dir/target > /dev/null
     mkdir -p build
     if [ ! -f "build/${circuit_name}.wtns" ]; then
-        if [ ! -f "../input.json"]; then
+        if [ ! -f "../input.json" ]; then
             node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../${circuit}.json build/${circuit_name}.wtns
         else
             node "${circuit_name}_js/generate_witness.js" "${circuit_name}_js/${circuit_name}.wasm" ../input.json build/${circuit_name}.wtns
