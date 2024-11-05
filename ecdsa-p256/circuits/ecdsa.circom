@@ -134,8 +134,6 @@ template ECDSAVerifyNoPubkeyCheck(n, k) {
     signal input msghash[k];
     signal input pubkey[2][k];
 
-    signal output result;
-
     var p[100] = get_p256_prime(n, k);
     var order[100] = get_p256_order(n, k);
 
@@ -221,7 +219,7 @@ template ECDSAVerifyNoPubkeyCheck(n, k) {
     component res_comp = IsEqual();
     res_comp.in[0] <== k;
     res_comp.in[1] <== num_equal[k - 2];
-    result <== res_comp.out;
+    res_comp.out === 1;
 }
 
 // TODO: implement ECDSA extended verify
